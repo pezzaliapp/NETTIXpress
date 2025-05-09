@@ -17,6 +17,13 @@ function addRow(codice, descrizione, netto, trasporto, installazione, margine) {
   const tbody = document.querySelector('#listino tbody');
   const tr = document.createElement('tr');
 
+  // Colonna checkbox
+  const checkboxCell = document.createElement('td');
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkboxCell.appendChild(checkbox);
+  tr.appendChild(checkboxCell);
+
   function createCell(content, editable = false, onChange = null) {
     const td = document.createElement('td');
     if (editable) {
@@ -55,7 +62,6 @@ function addRow(codice, descrizione, netto, trasporto, installazione, margine) {
 }
 
 // Inserimento manuale
-
 document.getElementById('manualForm').addEventListener('submit', function (e) {
   e.preventDefault();
   const codice = document.getElementById('codice').value;
@@ -67,4 +73,13 @@ document.getElementById('manualForm').addEventListener('submit', function (e) {
   if (!codice || isNaN(netto)) return;
   addRow(codice, descrizione, netto, trasporto || 0, installazione || 0, margine || 0);
   e.target.reset();
+});
+
+// Ricerca dinamica
+document.getElementById('searchInput').addEventListener('input', function () {
+  const value = this.value.toLowerCase();
+  document.querySelectorAll('#listino tbody tr').forEach(row => {
+    const text = row.innerText.toLowerCase();
+    row.style.display = text.includes(value) ? '' : 'none';
+  });
 });
