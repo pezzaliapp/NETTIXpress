@@ -11,7 +11,7 @@
     body { font-family: sans-serif; padding: 1em; }
     table { border-collapse: collapse; width: 100%; margin-top: 1em; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    input[type='number'] { width: 80px; }
+    input[type='number'], input[type='text'] { width: 100px; }
   </style>
 </head>
 <body>
@@ -30,9 +30,13 @@
     <button type="submit">Aggiungi</button>
   </form>
 
+  <h2>Ricerca rapida</h2>
+  <input type="text" id="searchInput" placeholder="Cerca prodotto...">
+
   <table id="listino">
     <thead>
       <tr>
+        <th>✓</th>
         <th>Codice</th>
         <th>Descrizione</th>
         <th>Prezzo Netto</th>
@@ -45,10 +49,7 @@
     <tbody></tbody>
   </table>
 
-  <!-- Script principale -->
   <script src="app.js"></script>
-
-  <!-- Registrazione del Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
