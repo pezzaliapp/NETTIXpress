@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NETTIXpress</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { font-family: sans-serif; padding: 1em; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1em; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    input[type='number'] { width: 80px; }
+  </style>
+</head>
+<body>
+  <h1>NETTIXpress</h1>
+  <input type="file" id="csvFile" accept=".csv">
+  <button onclick="parseCSV()">Carica CSV</button>
+
+  <h2>Inserimento manuale</h2>
+  <form id="manualForm">
+    <input type="text" placeholder="Codice" id="codice">
+    <input type="text" placeholder="Descrizione" id="descrizione">
+    <input type="number" placeholder="Prezzo netto" id="netto">
+    <input type="number" placeholder="Trasporto" id="trasporto">
+    <input type="number" placeholder="Installazione" id="installazione">
+    <input type="number" placeholder="Margine %" id="margine">
+    <button type="submit">Aggiungi</button>
+  </form>
+
+  <table id="listino">
+    <thead>
+      <tr>
+        <th>Codice</th>
+        <th>Descrizione</th>
+        <th>Prezzo Netto</th>
+        <th>Trasporto</th>
+        <th>Installazione</th>
+        <th>Margine %</th>
+        <th>Prezzo di Vendita</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    function parseCSV() {
+      const fileInput = document.getElementById('csvFile');
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const lines = e.target.result.split('\n');
+        lines.shift(); // elimina intestazione
+        lines.forEach(line => {
+          const [codice, descrizione, netto, trasporto, installazione] = line.split(',');
+          if (!codice) return;
+          addRow(codice, descrizione, parseFloat(netto), parseFloat(trasporto), parseFloat(installazione), 0);
+        });
+      };
+      reader.readAsText(fileInput.files[0]);
+    }
+
+    function addRow(codice, descrizione, netto, trasporto, installazione, margine) {
+      const tbody = document.querySelector('#listino tbody');
+      const tr = document.createElement('tr');
+
+      function createCell(content, editable = false, onChange = null) {
+        const td = document.createElement('td');
+        if (editable) {
+          const input = document.createElement('input');
+          input.type = 'number';
+          input.value = content;
+          input.addEventListener('input', onChange);
+          td.appendChild(input);
+        } else {
+          td.textContent = content;
+        }
+        return td;
+      }
+
+      let prezzoVenditaCell = document.createElement('td');
+
+      function updatePrezzoVendita() {
+        const marg = parseFloat(tr.querySelector('.margine input').value) || 0;
+        const vend = netto / (1 - (marg / 100));
+        prezzoVenditaCell.textContent = vend.toFixed(2);
+      }
+
+      tr.appendChild(createCell(codice));
+      tr.appendChild(createCell(descrizione));
+      tr.appendChild(createCell(netto.toFixed(2)));
+      tr.appendChild(createCell(trasporto.toFixed(2)));
+      tr.appendChild(createCell(installazione.toFixed(2)));
+
+      const margineCell = createCell(margine.toFixed(2), true, updatePrezzoVendita);
+      margineCell.classList.add('margine');
+      tr.appendChild(margineCell);
+      tr.appendChild(prezzoVenditaCell);
+
+      updatePrezzoVendita();
+      tbody.appendChild(tr);
+    }
+
+    document.getElementById('manualForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const codice = document.getElementById('codice').value;
+      const descrizione = document.getElementById('descrizione').value;
+      const netto = parseFloat(document.getElementById('netto').value);
+      const trasporto = parseFloat(document.getElementById('trasporto').value);
+      const installazione = parseFloat(document.getElementById('installazione').value);
+      const margine = parseFloat(document.getElementById('margine').value);
+      if (!codice || isNaN(netto)) return;
+      addRow(codice, descrizione, netto, trasporto || 0, installazione || 0, margine || 0);
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>
