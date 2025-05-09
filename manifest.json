@@ -1,6 +1,6 @@
 {
   "name": "NETTIXpress",
-  "short_name": "NETTIXpress",
+  "short_name": "NETTI",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
