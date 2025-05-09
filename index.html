@@ -112,6 +112,14 @@
       addRow(codice, descrizione, netto, trasporto || 0, installazione || 0, margine || 0);
       e.target.reset();
     });
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js').catch(error => {
+      console.error('Service Worker registration failed:', error);
+    });
+  }
+</script>
+    
   </script>
 </body>
 </html>
