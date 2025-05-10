@@ -3,62 +3,61 @@ function parseCSV() {
   const reader = new FileReader();
   reader.onload = function (e) {
     const lines = e.target.result.split('\n');
-    lines.shift(); // elimina intestazione
+    lines.shift(); // rimuove intestazione
     lines.forEach(line => {
       const [codice, descrizione, netto, trasporto, installazione] = line.split(',');
       if (!codice) return;
-      addRow(codice, descrizione, parseFloat(netto), parseFloat(trasporto), parseFloat(installazione), 0);
+      addCard(codice, descrizione, parseFloat(netto), parseFloat(trasporto), parseFloat(installazione), 0);
     });
   };
   reader.readAsText(fileInput.files[0]);
 }
 
-function addRow(codice, descrizione, netto, trasporto, installazione, margine) {
-  const tbody = document.querySelector('#listino tbody');
-  const tr = document.createElement('tr');
+function addCard(codice, descrizione, netto, trasporto, installazione, margine) {
+  const container = document.getElementById('listino');
 
-  // Colonna checkbox
-  const checkboxCell = document.createElement('td');
+  const card = document.createElement('div');
+  card.className = 'card';
+
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
-  checkboxCell.appendChild(checkbox);
-  tr.appendChild(checkboxCell);
 
-  function createCell(content, editable = false, onChange = null) {
-    const td = document.createElement('td');
-    if (editable) {
-      const input = document.createElement('input');
-      input.type = 'number';
-      input.value = content;
-      input.addEventListener('input', onChange);
-      td.appendChild(input);
-    } else {
-      td.textContent = content;
-    }
-    return td;
+  const blocco = (label, value) => {
+    const p = document.createElement('p');
+    p.innerHTML = `<strong>${label}:</strong> ${value}`;
+    return p;
+  };
+
+  const margineInput = document.createElement('input');
+  margineInput.type = 'number';
+  margineInput.value = margine;
+  margineInput.style.width = '80px';
+
+  const prezzoVendita = document.createElement('p');
+
+  function updatePrezzo() {
+    const m = parseFloat(margineInput.value) || 0;
+    const prezzo = netto / (1 - (m / 100));
+    prezzoVendita.innerHTML = `<strong>Prezzo Vendita:</strong> ${prezzo.toFixed(2)} €`;
   }
 
-  let prezzoVenditaCell = document.createElement('td');
+  margineInput.addEventListener('input', updatePrezzo);
 
-  function updatePrezzoVendita() {
-    const marg = parseFloat(tr.querySelector('.margine input').value) || 0;
-    const vend = netto / (1 - (marg / 100));
-    prezzoVenditaCell.textContent = vend.toFixed(2);
-  }
+  card.appendChild(checkbox);
+  card.appendChild(blocco('Codice', codice));
+  card.appendChild(blocco('Descrizione', descrizione));
+  card.appendChild(blocco('Prezzo Netto', netto.toFixed(2) + ' €'));
+  card.appendChild(blocco('Trasporto', trasporto.toFixed(2) + ' €'));
+  card.appendChild(blocco('Installazione', installazione.toFixed(2) + ' €'));
 
-  tr.appendChild(createCell(codice));
-  tr.appendChild(createCell(descrizione));
-  tr.appendChild(createCell(netto.toFixed(2)));
-  tr.appendChild(createCell(trasporto.toFixed(2)));
-  tr.appendChild(createCell(installazione.toFixed(2)));
+  const margineBlock = document.createElement('p');
+  margineBlock.innerHTML = '<strong>Margine %:</strong> ';
+  margineBlock.appendChild(margineInput);
+  card.appendChild(margineBlock);
+  updatePrezzo();
+  card.appendChild(prezzoVendita);
 
-  const margineCell = createCell(margine.toFixed(2), true, updatePrezzoVendita);
-  margineCell.classList.add('margine');
-  tr.appendChild(margineCell);
-  tr.appendChild(prezzoVenditaCell);
-
-  updatePrezzoVendita();
-  tbody.appendChild(tr);
+  container.appendChild(card);
 }
 
 // Inserimento manuale
@@ -71,15 +70,15 @@ document.getElementById('manualForm').addEventListener('submit', function (e) {
   const installazione = parseFloat(document.getElementById('installazione').value);
   const margine = parseFloat(document.getElementById('margine').value);
   if (!codice || isNaN(netto)) return;
-  addRow(codice, descrizione, netto, trasporto || 0, installazione || 0, margine || 0);
+  addCard(codice, descrizione, netto, trasporto || 0, installazione || 0, margine || 0);
   e.target.reset();
 });
 
 // Ricerca dinamica
 document.getElementById('searchInput').addEventListener('input', function () {
   const value = this.value.toLowerCase();
-  document.querySelectorAll('#listino tbody tr').forEach(row => {
-    const text = row.innerText.toLowerCase();
-    row.style.display = text.includes(value) ? '' : 'none';
+  document.querySelectorAll('#listino .card').forEach(card => {
+    const text = card.innerText.toLowerCase();
+    card.style.display = text.includes(value) ? '' : 'none';
   });
 });
