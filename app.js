@@ -6,7 +6,7 @@ function parseCSV() {
   const reader = new FileReader();
   reader.onload = function (e) {
     const lines = e.target.result.split('\n');
-    lines.shift(); // salta intestazione
+    lines.shift();
     lines.forEach(line => {
       const values = line.split(';');
       if (values.length < 6) return;
@@ -45,14 +45,22 @@ function addCard(codice, descrizione, netto, trasporto, installazione, margine) 
   margineInput.style.width = '80px';
 
   const prezzoVendita = document.createElement('p');
+  const prezzoConTrasportoBlock = document.createElement('p');
+  prezzoConTrasportoBlock.innerHTML = '<strong>Prezzo con Trasporto:</strong> ';
+  const inputPrezzoTot = document.createElement('input');
+  inputPrezzoTot.type = 'number';
+  inputPrezzoTot.step = '0.01';
+  inputPrezzoTot.style.width = '100px';
 
-  function updatePrezzo() {
+  function updatePrezzi() {
     const m = parseFloat(margineInput.value) || 0;
-    const prezzo = netto / (1 - (m / 100));
-    prezzoVendita.innerHTML = `<strong>Prezzo Vendita:</strong> ${isNaN(prezzo) ? '—' : prezzo.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €`;
+    const vend = netto / (1 - (m / 100));
+    prezzoVendita.innerHTML = `<strong>Prezzo Vendita:</strong> ${isNaN(vend) ? '—' : vend.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €`;
+    const totale = vend + trasporto;
+    inputPrezzoTot.value = isNaN(totale) ? '' : totale.toFixed(2);
   }
 
-  margineInput.addEventListener('input', updatePrezzo);
+  margineInput.addEventListener('input', updatePrezzi);
 
   card.appendChild(checkbox);
   card.appendChild(blocco('Codice', codice));
@@ -65,8 +73,12 @@ function addCard(codice, descrizione, netto, trasporto, installazione, margine) 
   margineBlock.innerHTML = '<strong>Margine %:</strong> ';
   margineBlock.appendChild(margineInput);
   card.appendChild(margineBlock);
-  updatePrezzo();
+
+  updatePrezzi();
   card.appendChild(prezzoVendita);
+
+  prezzoConTrasportoBlock.appendChild(inputPrezzoTot);
+  card.appendChild(prezzoConTrasportoBlock);
 
   container.appendChild(card);
 
@@ -78,7 +90,7 @@ function addCard(codice, descrizione, netto, trasporto, installazione, margine) 
 
 function aggiornaSelectFiltro() {
   const select = document.getElementById('filtroCodice');
-  select.innerHTML = '<option value=\"\">Tutti i prodotti</option>';
+  select.innerHTML = '<option value="">Tutti i prodotti</option>';
   elencoCodici.forEach(codice => {
     const opt = document.createElement('option');
     opt.value = codice;
@@ -132,9 +144,7 @@ function aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione,
 
 function esportaSelezionati() {
   if (prodottiSelezionati.length === 0) return;
-  const righe = prodottiSelezionati.map(p =>
-    `${p.codice};${p.descrizione};${p.netto};${p.trasporto};${p.installazione};${p.margine}`
-  );
+  const righe = prodottiSelezionati.map(p => `${p.codice};${p.descrizione};${p.netto};${p.trasporto};${p.installazione};${p.margine}`);
   const csvContent = 'data:text/csv;charset=utf-8,' + ['codice;descrizione;netto;trasporto;installazione;margine'].concat(righe).join('\n');
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
