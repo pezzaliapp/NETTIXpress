@@ -192,7 +192,9 @@ function aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione,
 
 function esportaSelezionati() {
   if (prodottiSelezionati.length === 0) return;
-  const righe = prodottiSelezionati.map(p => `${p.codice};${p.descrizione};${p.netto};${p.trasporto};${p.installazione};${p.margine.toFixed(2)};${p.prezzoVendita};${p.prezzoConTrasporto};${p.prezzoConInstallazione};${p.prezzoTotale}`);
+  const righe = prodottiSelezionati.map(p =>
+    `${p.codice};${p.descrizione};${p.netto};${p.trasporto};${p.installazione};${p.margine.toFixed(2)};${p.prezzoVendita};${p.prezzoConTrasporto};${p.prezzoConInstallazione};${p.prezzoTotale}`
+  );
 
   let sommaVendita = 0, sommaConTrasporto = 0, sommaConInstallazione = 0, sommaTotale = 0;
   prodottiSelezionati.forEach(p => {
@@ -203,7 +205,6 @@ function esportaSelezionati() {
   });
 
   righe.push(`TOTALE;;;;;;${sommaVendita.toFixed(2)};${sommaConTrasporto.toFixed(2)};${sommaConInstallazione.toFixed(2)};${sommaTotale.toFixed(2)}`);
-
   const csvContent = 'data:text/csv;charset=utf-8,' + ['codice;descrizione;netto;trasporto;installazione;margine;prezzo_vendita;prezzo_con_trasporto;prezzo_con_installazione;totale_finale'].concat(righe).join('\n');
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
