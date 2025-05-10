@@ -14,7 +14,7 @@
       background: #fff;
     }
 
-    input[type='number'], input[type='text'] {
+    input[type='number'], input[type='text'], select {
       width: 100px;
       margin: 4px;
     }
@@ -30,6 +30,12 @@
 
     .card p {
       margin: 4px 0;
+    }
+
+    #riepilogo {
+      border-top: 2px solid #ccc;
+      margin-top: 20px;
+      padding-top: 10px;
     }
 
     button {
@@ -56,8 +62,19 @@
 
   <h2>Ricerca rapida</h2>
   <input type="text" id="searchInput" placeholder="Cerca prodotto...">
+  
+  <h3>Filtra per codice prodotto</h3>
+  <select id="filtroCodice">
+    <option value="">Tutti i prodotti</option>
+  </select>
 
   <div id="listino"></div>
+
+  <div id="riepilogo">
+    <h2>Articoli selezionati</h2>
+    <ul id="listaSelezionati"></ul>
+    <button onclick="esportaSelezionati()">Esporta CSV</button>
+  </div>
 
   <script src="app.js"></script>
   <script>
