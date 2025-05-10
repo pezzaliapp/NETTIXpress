@@ -1,26 +1,27 @@
 const CACHE_NAME = 'nettixpress-cache-v1';
 const URLS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/app.js',
-  '/manifest.json',
-  '/icon/nettixpress-192.png',
-  '/icon/nettixpress-512.png'
+  './',
+  './index.html',
+  './app.js',
+  './manifest.json',
+  './icon/nettixpress-192.png',
+  './icon/nettixpress-512.png'
 ];
 
-// Installazione del service worker e caching delle risorse
+// Installazione del Service Worker
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(URLS_TO_CACHE))
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(URLS_TO_CACHE))
   );
 });
 
-// Attivazione e rimozione delle vecchie cache
+// Attivazione: pulizia cache vecchie
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keyList =>
+    caches.keys().then(keys =>
       Promise.all(
-        keyList.map(key => {
+        keys.map(key => {
           if (key !== CACHE_NAME) return caches.delete(key);
         })
       )
@@ -28,7 +29,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Intercettazione delle richieste per servire da cache o da rete
+// Intercetta richieste e serve dalla cache
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response =>
