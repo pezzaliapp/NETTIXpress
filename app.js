@@ -21,7 +21,7 @@ function parseCSV() {
   reader.readAsText(fileInput.files[0]);
 }
 
-function addCard(codice, descrizione, netto, trasporto, installazione, margine) {
+function addCard(codice, descrizione, netto, trasportoVal, installazioneVal, margine) {
   const container = document.getElementById('listino');
   const card = document.createElement('div');
   card.className = 'card';
@@ -30,12 +30,13 @@ function addCard(codice, descrizione, netto, trasporto, installazione, margine) 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
   checkbox.addEventListener('change', () =>
-    aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione, margine, checkbox.checked)
+    aggiornaRiepilogo(codice, descrizione, netto, trasportoInput.value, installazioneInput.value, margineInput.value, checkbox.checked)
   );
 
-  const blocco = (label, value) => {
+  const blocco = (label, element) => {
     const p = document.createElement('p');
-    p.innerHTML = `<strong>${label}:</strong> ${value}`;
+    p.innerHTML = `<strong>${label}:</strong> `;
+    p.appendChild(element);
     return p;
   };
 
@@ -44,30 +45,38 @@ function addCard(codice, descrizione, netto, trasporto, installazione, margine) 
   margineInput.value = margine;
   margineInput.style.width = '80px';
 
+  const trasportoInput = document.createElement('input');
+  trasportoInput.type = 'number';
+  trasportoInput.value = trasportoVal;
+  trasportoInput.style.width = '80px';
+
+  const installazioneInput = document.createElement('input');
+  installazioneInput.type = 'number';
+  installazioneInput.value = installazioneVal;
+  installazioneInput.style.width = '80px';
+
   const prezzoVendita = document.createElement('p');
-  const prezzoConTrasportoBlock = document.createElement('p');
-  prezzoConTrasportoBlock.innerHTML = '<strong>Prezzo con Trasporto:</strong> ';
-  const inputPrezzoTot = document.createElement('input');
-  inputPrezzoTot.type = 'number';
-  inputPrezzoTot.step = '0.01';
-  inputPrezzoTot.style.width = '100px';
+  const prezzoConTrasporto = document.createElement('p');
 
   function updatePrezzi() {
     const m = parseFloat(margineInput.value) || 0;
+    const t = parseFloat(trasportoInput.value) || 0;
     const vend = netto / (1 - (m / 100));
-    prezzoVendita.innerHTML = `<strong>Prezzo Vendita:</strong> ${isNaN(vend) ? '—' : vend.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €`;
-    const totale = vend + trasporto;
-    inputPrezzoTot.value = isNaN(totale) ? '' : totale.toFixed(2);
+    prezzoVendita.innerHTML = `<strong>Prezzo Vendita:</strong> ${vend.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €`;
+    const totale = vend + t;
+    prezzoConTrasporto.innerHTML = `<strong>Prezzo con Trasporto:</strong> ${totale.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €`;
   }
 
   margineInput.addEventListener('input', updatePrezzi);
+  trasportoInput.addEventListener('input', updatePrezzi);
+  installazioneInput.addEventListener('input', updatePrezzi);
 
   card.appendChild(checkbox);
-  card.appendChild(blocco('Codice', codice));
-  card.appendChild(blocco('Descrizione', descrizione || '—'));
-  card.appendChild(blocco('Prezzo Netto', netto.toLocaleString('it-IT', { minimumFractionDigits: 2 }) + ' €'));
-  card.appendChild(blocco('Trasporto', trasporto.toLocaleString('it-IT', { minimumFractionDigits: 2 }) + ' €'));
-  card.appendChild(blocco('Installazione', installazione.toLocaleString('it-IT', { minimumFractionDigits: 2 }) + ' €'));
+  card.appendChild(blocco('Codice', document.createTextNode(codice)));
+  card.appendChild(blocco('Descrizione', document.createTextNode(descrizione || '—')));
+  card.appendChild(blocco('Prezzo Netto', document.createTextNode(netto.toLocaleString('it-IT', { minimumFractionDigits: 2 }) + ' €')));
+  card.appendChild(blocco('Trasporto', trasportoInput));
+  card.appendChild(blocco('Installazione', installazioneInput));
 
   const margineBlock = document.createElement('p');
   margineBlock.innerHTML = '<strong>Margine %:</strong> ';
@@ -76,9 +85,7 @@ function addCard(codice, descrizione, netto, trasporto, installazione, margine) 
 
   updatePrezzi();
   card.appendChild(prezzoVendita);
-
-  prezzoConTrasportoBlock.appendChild(inputPrezzoTot);
-  card.appendChild(prezzoConTrasportoBlock);
+  card.appendChild(prezzoConTrasporto);
 
   container.appendChild(card);
 
