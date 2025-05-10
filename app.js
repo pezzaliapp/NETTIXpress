@@ -8,7 +8,7 @@ function parseCSV() {
     const lines = e.target.result.split('\n');
     lines.shift();
     lines.forEach(line => {
-      const [codice, descrizione, netto, trasporto, installazione] = line.split(',');
+      const [codice, descrizione, netto, trasporto, installazione] = line.split(';');
       if (!codice) return;
       addCard(codice, descrizione, parseFloat(netto), parseFloat(trasporto), parseFloat(installazione), 0);
     });
