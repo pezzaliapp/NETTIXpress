@@ -6,13 +6,13 @@ function parseCSV() {
   const reader = new FileReader();
   reader.onload = function (e) {
     const lines = e.target.result.split('\n');
-    lines.shift(); // salta l'intestazione
+    lines.shift();
     lines.forEach(line => {
       const values = line.split(';');
-      if (values.length < 6) return; // ignora righe non valide
+      if (values.length < 6) return;
       const codice = values[0];
       const descrizione = values[1];
-      const prezzoNetto = parseFloat(values[3].replace(',', '.')); // prezzo netto di acquisto
+      const prezzoNetto = parseFloat(values[3].replace(',', '.'));
       const installazione = parseFloat(values[4].replace(',', '.'));
       const trasporto = parseFloat(values[5].replace(',', '.'));
       addCard(codice, descrizione, prezzoNetto, trasporto, installazione, 0);
@@ -20,6 +20,7 @@ function parseCSV() {
   };
   reader.readAsText(fileInput.files[0]);
 }
+
 function addCard(codice, descrizione, netto, trasporto, installazione, margine) {
   const container = document.getElementById('listino');
   const card = document.createElement('div');
@@ -46,7 +47,7 @@ function addCard(codice, descrizione, netto, trasporto, installazione, margine) 
   function updatePrezzo() {
     const m = parseFloat(margineInput.value) || 0;
     const prezzo = netto / (1 - (m / 100));
-    prezzoVendita.innerHTML = `<strong>Prezzo Vendita:</strong> ${prezzo.toFixed(2)} €`;
+    prezzoVendita.innerHTML = `<strong>Prezzo Vendita:</strong> ${isNaN(prezzo) ? '—' : prezzo.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €`;
   }
 
   margineInput.addEventListener('input', updatePrezzo);
@@ -54,9 +55,9 @@ function addCard(codice, descrizione, netto, trasporto, installazione, margine) 
   card.appendChild(checkbox);
   card.appendChild(blocco('Codice', codice));
   card.appendChild(blocco('Descrizione', descrizione || '—'));
-  card.appendChild(blocco('Prezzo Netto', isNaN(netto) ? '—' : netto.toFixed(2) + ' €'));
-  card.appendChild(blocco('Trasporto', isNaN(trasporto) ? '—' : trasporto.toFixed(2) + ' €'));
-  card.appendChild(blocco('Installazione', isNaN(installazione) ? '—' : installazione.toFixed(2) + ' €'));
+  card.appendChild(blocco('Prezzo Netto', isNaN(netto) ? '—' : netto.toLocaleString('it-IT', { minimumFractionDigits: 2 }) + ' €'));
+  card.appendChild(blocco('Trasporto', isNaN(trasporto) ? '—' : trasporto.toLocaleString('it-IT', { minimumFractionDigits: 2 }) + ' €'));
+  card.appendChild(blocco('Installazione', isNaN(installazione) ? '—' : installazione.toLocaleString('it-IT', { minimumFractionDigits: 2 }) + ' €'));
 
   const margineBlock = document.createElement('p');
   margineBlock.innerHTML = '<strong>Margine %:</strong> ';
@@ -122,15 +123,15 @@ function aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione,
   lista.innerHTML = '';
   prodottiSelezionati.forEach(p => {
     const li = document.createElement('li');
-    li.textContent = `${p.codice} - ${p.descrizione || '—'} - Prezzo Netto: ${p.netto || 0} €`;
+    li.textContent = `${p.codice} - ${p.descrizione || '—'} - Prezzo Netto: ${p.netto.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €`;
     lista.appendChild(li);
   });
 }
 
 function esportaSelezionati() {
   if (prodottiSelezionati.length === 0) return;
-  const righe = prodottiSelezionati.map(p => `${p.codice},${p.descrizione},${p.netto},${p.trasporto},${p.installazione},${p.margine}`);
-  const csvContent = 'data:text/csv;charset=utf-8,' + ['codice,descrizione,netto,trasporto,installazione,margine'].concat(righe).join('\n');
+  const righe = prodottiSelezionati.map(p => `${p.codice};${p.descrizione};${p.netto};${p.trasporto};${p.installazione};${p.margine}`);
+  const csvContent = 'data:text/csv;charset=utf-8,' + ['codice;descrizione;netto;trasporto;installazione;margine'].concat(righe).join('\n');
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
