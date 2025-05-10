@@ -8,14 +8,38 @@
   <link rel="apple-touch-icon" href="icon/nettixpress-192.png">
   <meta name="theme-color" content="#004080">
   <style>
-    body { font-family: sans-serif; padding: 1em; }
-    table { border-collapse: collapse; width: 100%; margin-top: 1em; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    input[type='number'], input[type='text'] { width: 100px; }
+    body {
+      font-family: sans-serif;
+      padding: 1em;
+      background: #fff;
+    }
+
+    input[type='number'], input[type='text'] {
+      width: 100px;
+      margin: 4px;
+    }
+
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px 0;
+      background: #fdfdfd;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .card p {
+      margin: 4px 0;
+    }
+
+    button {
+      margin-left: 4px;
+    }
   </style>
 </head>
 <body>
   <h1>NETTIXpress</h1>
+
   <input type="file" id="csvFile" accept=".csv">
   <button onclick="parseCSV()">Carica CSV</button>
 
@@ -33,21 +57,7 @@
   <h2>Ricerca rapida</h2>
   <input type="text" id="searchInput" placeholder="Cerca prodotto...">
 
-  <table id="listino">
-    <thead>
-      <tr>
-        <th>✓</th>
-        <th>Codice</th>
-        <th>Descrizione</th>
-        <th>Prezzo Netto</th>
-        <th>Trasporto</th>
-        <th>Installazione</th>
-        <th>Margine %</th>
-        <th>Prezzo di Vendita</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div id="listino"></div>
 
   <script src="app.js"></script>
   <script>
