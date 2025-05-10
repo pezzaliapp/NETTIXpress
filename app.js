@@ -76,6 +76,18 @@ function addCard(codice, descrizione, netto, trasportoVal, installazioneVal, mar
   trasportoInput.addEventListener('input', updatePrezzi);
   installazioneInput.addEventListener('input', updatePrezzi);
 
+  // 🔄 Aggiorna lista selezionati se input modificati
+  [margineInput, trasportoInput, installazioneInput].forEach(input => {
+    input.addEventListener('input', () => {
+      if (checkbox.checked) {
+        const vend = netto / (1 - (parseFloat(margineInput.value || 0) / 100));
+        const tr = parseFloat(trasportoInput.value) || 0;
+        const ins = parseFloat(installazioneInput.value) || 0;
+        aggiornaRiepilogo(codice, descrizione, netto, tr, ins, parseFloat(margineInput.value), checkbox.checked, vend);
+      }
+    });
+  });
+
   checkbox.addEventListener('change', () => {
     const vend = netto / (1 - (parseFloat(margineInput.value || 0) / 100));
     const tr = parseFloat(trasportoInput.value) || 0;
@@ -153,6 +165,7 @@ function aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione,
     const prezzoConTrasporto = prezzoVendita + trasporto;
     const prezzoConInstallazione = prezzoVendita + installazione;
     const prezzoTotale = prezzoVendita + trasporto + installazione;
+    prodottiSelezionati = prodottiSelezionati.filter(p => p.codice !== codice); // elimina duplicati
     prodottiSelezionati.push({ codice, descrizione, netto, trasporto, installazione, margine, prezzoVendita, prezzoConTrasporto, prezzoConInstallazione, prezzoTotale });
   } else {
     prodottiSelezionati = prodottiSelezionati.filter(p => p.codice !== codice);
