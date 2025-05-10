@@ -172,7 +172,9 @@ function aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione,
     sommaTotale += p.prezzoTotale;
 
     const li = document.createElement('li');
-   li.textContent = `${p.codice} - ${p.descrizione} | Netto: ${p.netto.toFixed(2)} € | Margine: ${p.margine.toFixed(2)}% | Vendita: ${p.prezzoVendita.toFixed(2)} € | +T: ${p.prezzoConTrasporto.toFixed(2)} € | +I: ${p.prezzoConInstallazione.toFixed(2)} € | Totale: ${p.prezzoTotale.toFixed(2)} €`;
+   const righe = prodottiSelezionati.map(p =>
+  `${p.codice};${p.descrizione};${p.netto};${p.trasporto};${p.installazione};${p.margine.toFixed(2)};${p.prezzoVendita};${p.prezzoConTrasporto};${p.prezzoConInstallazione};${p.prezzoTotale}`
+);
     lista.appendChild(li);
   });
 
