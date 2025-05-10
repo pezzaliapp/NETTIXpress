@@ -29,9 +29,6 @@ function addCard(codice, descrizione, netto, trasportoVal, installazioneVal, mar
 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
-  checkbox.addEventListener('change', () =>
-    aggiornaRiepilogo(codice, descrizione, netto, trasportoInput.value, installazioneInput.value, margineInput.value, checkbox.checked)
-  );
 
   const blocco = (label, element) => {
     const p = document.createElement('p');
@@ -57,19 +54,23 @@ function addCard(codice, descrizione, netto, trasportoVal, installazioneVal, mar
 
   const prezzoVendita = document.createElement('p');
   const prezzoConTrasporto = document.createElement('p');
+  let prezzoVenditaVal = 0;
 
   function updatePrezzi() {
     const m = parseFloat(margineInput.value) || 0;
     const t = parseFloat(trasportoInput.value) || 0;
-    const vend = netto / (1 - (m / 100));
-    prezzoVendita.innerHTML = `<strong>Prezzo Vendita:</strong> ${vend.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €`;
-    const totale = vend + t;
+    prezzoVenditaVal = netto / (1 - (m / 100));
+    prezzoVendita.innerHTML = `<strong>Prezzo Vendita:</strong> ${prezzoVenditaVal.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €`;
+    const totale = prezzoVenditaVal + t;
     prezzoConTrasporto.innerHTML = `<strong>Prezzo con Trasporto:</strong> ${totale.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €`;
   }
 
   margineInput.addEventListener('input', updatePrezzi);
   trasportoInput.addEventListener('input', updatePrezzi);
   installazioneInput.addEventListener('input', updatePrezzi);
+  checkbox.addEventListener('change', () =>
+    aggiornaRiepilogo(codice, descrizione, netto, parseFloat(trasportoInput.value), parseFloat(installazioneInput.value), parseFloat(margineInput.value), checkbox.checked, prezzoVenditaVal)
+  );
 
   card.appendChild(checkbox);
   card.appendChild(blocco('Codice', document.createTextNode(codice)));
@@ -134,9 +135,10 @@ document.getElementById('searchInput').addEventListener('input', function () {
   });
 });
 
-function aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione, margine, selezionato) {
+function aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione, margine, selezionato, prezzoVendita) {
   if (selezionato) {
-    prodottiSelezionati.push({ codice, descrizione, netto, trasporto, installazione, margine });
+    const prezzoConTrasporto = prezzoVendita + trasporto;
+    prodottiSelezionati.push({ codice, descrizione, netto, trasporto, installazione, margine, prezzoVendita, prezzoConTrasporto });
   } else {
     prodottiSelezionati = prodottiSelezionati.filter(p => p.codice !== codice);
   }
@@ -151,8 +153,8 @@ function aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione,
 
 function esportaSelezionati() {
   if (prodottiSelezionati.length === 0) return;
-  const righe = prodottiSelezionati.map(p => `${p.codice};${p.descrizione};${p.netto};${p.trasporto};${p.installazione};${p.margine}`);
-  const csvContent = 'data:text/csv;charset=utf-8,' + ['codice;descrizione;netto;trasporto;installazione;margine'].concat(righe).join('\n');
+  const righe = prodottiSelezionati.map(p => `${p.codice};${p.descrizione};${p.netto};${p.trasporto};${p.installazione};${p.margine};${p.prezzoVendita};${p.prezzoConTrasporto}`);
+  const csvContent = 'data:text/csv;charset=utf-8,' + ['codice;descrizione;netto;trasporto;installazione;margine;prezzo_vendita;prezzo_con_trasporto'].concat(righe).join('\n');
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
