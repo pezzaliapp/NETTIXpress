@@ -6,16 +6,20 @@ function parseCSV() {
   const reader = new FileReader();
   reader.onload = function (e) {
     const lines = e.target.result.split('\n');
-    lines.shift();
+    lines.shift(); // salta l'intestazione
     lines.forEach(line => {
-      const [codice, descrizione, netto, trasporto, installazione] = line.split(';');
-      if (!codice) return;
-      addCard(codice, descrizione, parseFloat(netto), parseFloat(trasporto), parseFloat(installazione), 0);
+      const values = line.split(';');
+      if (values.length < 6) return; // ignora righe non valide
+      const codice = values[0];
+      const descrizione = values[1];
+      const prezzoNetto = parseFloat(values[3].replace(',', '.')); // prezzo netto di acquisto
+      const installazione = parseFloat(values[4].replace(',', '.'));
+      const trasporto = parseFloat(values[5].replace(',', '.'));
+      addCard(codice, descrizione, prezzoNetto, trasporto, installazione, 0);
     });
   };
   reader.readAsText(fileInput.files[0]);
 }
-
 function addCard(codice, descrizione, netto, trasporto, installazione, margine) {
   const container = document.getElementById('listino');
   const card = document.createElement('div');
