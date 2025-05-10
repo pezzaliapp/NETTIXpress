@@ -1,61 +1,38 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NETTIXpress</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon/nettixpress-192.png">
-  <meta name="theme-color" content="#004080">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon/nettixpress-192.png" />
+  <meta name="theme-color" content="#004080" />
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 1em;
-      background: #fff;
-    }
-    input[type='number'], input[type='text'], select {
-      width: 100px;
-      margin: 4px;
-    }
-    .card {
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      margin: 10px 0;
-      background: #fdfdfd;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .card p {
-      margin: 4px 0;
-    }
-    #riepilogo {
-      border-top: 2px solid #ccc;
-      margin-top: 20px;
-      padding-top: 10px;
-    }
-    button {
-      margin: 6px 4px;
-    }
+    body { font-family: sans-serif; padding: 1em; max-width: 800px; margin: auto; }
+    input, select, button { margin: 4px; padding: 6px; font-size: 1em; }
+    .card { border: 1px solid #ccc; padding: 1em; margin: 1em 0; border-radius: 8px; }
+    input[type="number"], input[type="text"] { width: 100px; }
   </style>
 </head>
 <body>
   <h1>NETTIXpress</h1>
-  <input type="file" id="csvFile" accept=".csv">
+
+  <input type="file" id="csvFile" accept=".csv" />
   <button onclick="parseCSV()">Carica CSV</button>
 
   <h2>Inserimento manuale</h2>
   <form id="manualForm">
-    <input type="text" placeholder="Codice" id="codice">
-    <input type="text" placeholder="Descrizione" id="descrizione">
-    <input type="number" placeholder="Prezzo netto" id="netto">
-    <input type="number" placeholder="Trasporto" id="trasporto">
-    <input type="number" placeholder="Installazione" id="installazione">
-    <input type="number" placeholder="Margine %" id="margine">
+    <input type="text" id="codice" placeholder="Codice" />
+    <input type="text" id="descrizione" placeholder="Descrizione" />
+    <input type="number" id="netto" placeholder="Prezzo netto" />
+    <input type="number" id="trasporto" placeholder="Trasporto" />
+    <input type="number" id="installazione" placeholder="Installazione" />
+    <input type="number" id="margine" placeholder="Margine %" />
     <button type="submit">Aggiungi</button>
   </form>
 
   <h2>Ricerca rapida</h2>
-  <input type="text" id="searchInput" placeholder="Cerca prodotto...">
+  <input type="text" id="searchInput" placeholder="Cerca prodotto..." />
 
   <h3>Filtra per codice prodotto</h3>
   <select id="filtroCodice">
@@ -64,14 +41,13 @@
 
   <div id="listino"></div>
 
-  <div id="riepilogo">
-    <h2>Articoli selezionati</h2>
-    <ul id="listaSelezionati"></ul>
-    <p id="totaliSelezionati"></p>
-    <button onclick="esportaSelezionati()">📤 Esporta CSV</button>
-    <button onclick="svuotaSelezione()">❌ Svuota selezione</button>
-    <button onclick="deselezionaTutti()">🔄 Deseleziona tutto</button>
-  </div>
+  <h2>Articoli selezionati</h2>
+  <ul id="listaSelezionati"></ul>
+  <div id="totaliSelezionati"></div>
+
+  <button onclick="esportaSelezionati()">📤 Esporta CSV</button>
+  <button onclick="svuotaSelezione()">🧹 Svuota selezione</button>
+  <button onclick="deselezionaTutti()">🚫 Deseleziona tutto</button>
 
   <script src="app.js"></script>
   <script>
