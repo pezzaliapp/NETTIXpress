@@ -162,7 +162,7 @@ function aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione,
   const totali = document.getElementById('totaliSelezionati');
   lista.innerHTML = '';
 
-  let sommaNetto = 0, sommaVendita = 0, sommaConTrasporto = 0, sommaConInstallazione = 0, sommaTotale = 0;
+  let sommaNetto = 0, sommaVendita = 0, sommaConTrasporto = 0, sommaConInstallazione = 0, sommaTotale = 0, sommaMargine = 0;
 
   prodottiSelezionati.forEach(p => {
     sommaNetto += p.netto;
@@ -170,15 +170,19 @@ function aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione,
     sommaConTrasporto += p.prezzoConTrasporto;
     sommaConInstallazione += p.prezzoConInstallazione;
     sommaTotale += p.prezzoTotale;
+    sommaMargine += p.margine;
 
     const li = document.createElement('li');
     li.textContent = `${p.codice} - ${p.descrizione} | Netto: ${p.netto.toFixed(2)} € | Margine: ${p.margine.toFixed(2)}% | Vendita: ${p.prezzoVendita.toFixed(2)} € | +T: ${p.prezzoConTrasporto.toFixed(2)} € | +I: ${p.prezzoConInstallazione.toFixed(2)} € | Totale: ${p.prezzoTotale.toFixed(2)} €`;
     lista.appendChild(li);
   });
 
+  const mediaMargine = prodottiSelezionati.length > 0 ? (sommaMargine / prodottiSelezionati.length) : 0;
+
   totali.innerHTML = `
     <strong>Totali:</strong><br>
     Netto: ${sommaNetto.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €<br>
+    Margine medio: ${mediaMargine.toFixed(2)}%<br>
     Prezzo Vendita: ${sommaVendita.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €<br>
     + Trasporto: ${sommaConTrasporto.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €<br>
     + Installazione: ${sommaConInstallazione.toLocaleString('it-IT', { minimumFractionDigits: 2 })} €<br>
