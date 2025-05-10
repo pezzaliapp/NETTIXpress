@@ -76,18 +76,6 @@ function addCard(codice, descrizione, netto, trasportoVal, installazioneVal, mar
   trasportoInput.addEventListener('input', updatePrezzi);
   installazioneInput.addEventListener('input', updatePrezzi);
 
-  // 🔄 Aggiorna lista selezionati se input modificati
-  [margineInput, trasportoInput, installazioneInput].forEach(input => {
-    input.addEventListener('input', () => {
-      if (checkbox.checked) {
-        const vend = netto / (1 - (parseFloat(margineInput.value || 0) / 100));
-        const tr = parseFloat(trasportoInput.value) || 0;
-        const ins = parseFloat(installazioneInput.value) || 0;
-        aggiornaRiepilogo(codice, descrizione, netto, tr, ins, parseFloat(margineInput.value), checkbox.checked, vend);
-      }
-    });
-  });
-
   checkbox.addEventListener('change', () => {
     const vend = netto / (1 - (parseFloat(margineInput.value || 0) / 100));
     const tr = parseFloat(trasportoInput.value) || 0;
@@ -165,7 +153,6 @@ function aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione,
     const prezzoConTrasporto = prezzoVendita + trasporto;
     const prezzoConInstallazione = prezzoVendita + installazione;
     const prezzoTotale = prezzoVendita + trasporto + installazione;
-    prodottiSelezionati = prodottiSelezionati.filter(p => p.codice !== codice); // elimina duplicati
     prodottiSelezionati.push({ codice, descrizione, netto, trasporto, installazione, margine, prezzoVendita, prezzoConTrasporto, prezzoConInstallazione, prezzoTotale });
   } else {
     prodottiSelezionati = prodottiSelezionati.filter(p => p.codice !== codice);
@@ -206,8 +193,8 @@ function aggiornaRiepilogo(codice, descrizione, netto, trasporto, installazione,
 function esportaSelezionati() {
   if (prodottiSelezionati.length === 0) return;
   const righe = prodottiSelezionati.map(p =>
-    `${p.codice};${p.descrizione};${p.netto};${p.trasporto};${p.installazione};${p.margine.toFixed(2)};${p.prezzoVendita};${p.prezzoConTrasporto};${p.prezzoConInstallazione};${p.prezzoTotale}`
-  );
+  `${p.codice};${p.descrizione};${p.netto.toFixed(2)};${p.trasporto.toFixed(2)};${p.installazione.toFixed(2)};${p.margine.toFixed(2)};${p.prezzoVendita.toFixed(2)};${p.prezzoConTrasporto.toFixed(2)};${p.prezzoConInstallazione.toFixed(2)};${p.prezzoTotale.toFixed(2)}`
+);
 
   let sommaVendita = 0, sommaConTrasporto = 0, sommaConInstallazione = 0, sommaTotale = 0;
   prodottiSelezionati.forEach(p => {
@@ -218,6 +205,7 @@ function esportaSelezionati() {
   });
 
   righe.push(`TOTALE;;;;;;${sommaVendita.toFixed(2)};${sommaConTrasporto.toFixed(2)};${sommaConInstallazione.toFixed(2)};${sommaTotale.toFixed(2)}`);
+
   const csvContent = 'data:text/csv;charset=utf-8,' + ['codice;descrizione;netto;trasporto;installazione;margine;prezzo_vendita;prezzo_con_trasporto;prezzo_con_installazione;totale_finale'].concat(righe).join('\n');
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
